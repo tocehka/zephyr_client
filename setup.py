@@ -6,5 +6,11 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     url="https://github.com/tocehka/zephyr_client",
-    author="tocehka"
+    author="tocehka",
+    install_requires=[
+        "pygatt==4.0.5"
+        "numpy>=1.18.2"
+        "python-socketio>=4.6.0"
+        "python-dotenv>=0.13.0"
+    ]
 )
