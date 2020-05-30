@@ -1,10 +1,10 @@
 from dotenv import load_dotenv
 import os
 from socket_client import createClient
-from zephyr_connection.stream import ZephyrStream
+from zephyr_connection import createStream
 
 if __name__ == "__main__":
     load_dotenv()
     socket = createClient()
-    stream = ZephyrStream(socket)
+    stream = createStream(socket)
     stream.run_stream()
