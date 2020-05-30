@@ -1,6 +1,6 @@
 import pygatt
 from time import strftime
-from numpy import mean
+from numpy import mean, isnan
 from config import conf
 
 
@@ -8,7 +8,6 @@ class ZephyrStream:
     def __init__(self, socket_client):
         self.adapter = pygatt.GATTToolBackend()
         self.socket_client = socket_client
-        print("Experiment was started at {}".format(strftime("%H:%M:%S")))
 
     def __handle_data(self, handle, value):
         try:
@@ -39,9 +38,11 @@ class ZephyrStream:
                 meas["rr"] = rr
             meas_data = {}
             if "rr" in meas:
-                meas_data = {"hr": meas["hr"], "rr": mean(meas["rr"]), "contact": meas["sensor_contact"]}
-                print(meas_data)
-                self.socket_client.send_data(meas_data)
+                mean_rr = mean(meas["rr"])
+                if not isnan(mean_rr)[0]:
+                    meas_data = {"hr": meas["hr"], "rr": mean_rr, "contact": meas["sensor_contact"]}
+                    print(meas_data)
+                    self.socket_client.send_data(meas_data)
         except ValueError:
             print("/nNothing to return/n")
     
@@ -53,6 +54,7 @@ class ZephyrStream:
                 device = self.adapter.connect(conf["MAC_adress"], timeout=10, auto_reconnect=True)
                 #print(device.discover_characteristics())
                 self.socket_client.connect()
+                print("Experiment was started at {}".format(strftime("%H:%M:%S")))
                 while True:
                     device.subscribe(conf["HEART_UUID"],
                                 callback=self.__handle_data)
